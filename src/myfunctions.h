@@ -8,7 +8,7 @@ namespace gui {
 	const extern QSize buttonSize;
 }
 namespace appCfg{
-	const extern QString urlPreffics;
+
 }
 
 #endif // MYFUNCTIONS_H

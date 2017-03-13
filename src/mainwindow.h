@@ -6,10 +6,9 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTabWidget>
-#include <QtWebKit>
-#include <QtWebKitWidgets/QWebView>
 
 #include "myfunctions.h"
+#include "tabwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -22,8 +21,9 @@ private slots:
 	void slot_newTab();
 	void slot_closeTab(int index);
 	void slot_findToNewTab();
+	void slot_titleChanged(QWidget *widget, const QString &title);
+	void slot_changeTab(int index);
 private:
-	QLineEdit* m_pUrlField;
 	QLineEdit* m_pFindFiled;
 	QTabWidget* m_pTabs;
 	void newTab(QString url);
