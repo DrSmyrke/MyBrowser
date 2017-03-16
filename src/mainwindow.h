@@ -18,15 +18,16 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 private slots:
-	void slot_newTab();
+	void slot_newTab(){newTab("");}
 	void slot_closeTab(int index);
 	void slot_findToNewTab();
 	void slot_titleChanged(QWidget *widget, const QString &title);
-	void slot_changeTab(int index);
+	void slot_newWindow(WebView **view);
 private:
 	QLineEdit* m_pFindFiled;
 	QTabWidget* m_pTabs;
 	void newTab(QString url);
+	TabWidget *createTabWidget();
 };
 
 #endif // MAINWINDOW_H

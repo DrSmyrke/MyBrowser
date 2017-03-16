@@ -5,11 +5,11 @@
         <file>images/document-print.svg</file>
         <file>images/edit-find.svg</file>
         <file>images/go-home.svg</file>
-        <file>images/go-next.svg</file>
-        <file>images/go-previous.svg</file>
         <file>images/help-about.svg</file>
         <file>images/tab-new.svg</file>
         <file>images/view-refresh.svg</file>
         <file>images/window-close.svg</file>
+        <file>images/go-next.svg</file>
+        <file>images/go-previous.svg</file>
     </qresource>
 </RCC>

@@ -13,16 +13,21 @@ TEMPLATE = app
 RC_FILE = index.rc
 QMAKE_CXXFLAGS += "-std=c++11"
 
+TRANSLATIONS = lang/ru.ts
 SOURCES += main.cpp\
         mainwindow.cpp \
     myfunctions.cpp \
     WebKit/webview.cpp \
-    tabwidget.cpp
+    tabwidget.cpp \
+    WebKit/webpage.cpp \
+    javascriptobj.cpp
 
 HEADERS  += mainwindow.h \
     myfunctions.h \
     WebKit/webview.h \
-    tabwidget.h
+    tabwidget.h \
+    WebKit/webpage.h \
+    javascriptobj.h
 
 RESOURCES += \
     resources.qrc

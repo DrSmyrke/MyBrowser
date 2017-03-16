@@ -7,8 +7,12 @@
 #include <QProgressBar>
 #include <QLineEdit>
 #include <QLabel>
+#include <QSplitter>
+#include <QWebInspector>
+#include <QWebFrame>
 
 #include "WebKit/webview.h"
+#include "javascriptobj.h"
 #include "myfunctions.h"
 
 class TabWidget : public QWidget
@@ -19,9 +23,11 @@ public:
 	void load(const QUrl &url);
 	void reload();
 	void actionUrl(const QString &url);
+	WebView* getView(){ return m_pWebView; }
+	void stop(){m_pWebView->stop();}
 signals:
 	void signal_titleChanged(QWidget* widget,const QString &text);
-	void signal_loadFinished(QWidget* widget);
+	void signal_createWindow(WebView** webView);
 private slots:
 	void slot_titleChanged(const QString &title);
 	void slot_urlChanged(const QUrl &url);
@@ -29,8 +35,10 @@ private slots:
 	void slot_loadFinished();
 	void slot_loadProgress(int prz);
 	void slot_goToUrl();
+	void slot_linkHovered(const QString &link);
 private:
 	WebView* m_pWebView;
+	QWebInspector* m_pInspector;
 	QProgressBar* m_pProgressBar;
 	QLineEdit* m_pUrlField;
 	QPushButton* m_pPrefB;
