@@ -25,6 +25,7 @@ public:
 	void actionUrl(const QString &url);
 	WebView* getView(){ return m_pWebView; }
 	void stop(){m_pWebView->stop();}
+	QString getUrl(){return m_pWebView->url().toString();}
 signals:
 	void signal_titleChanged(QWidget* widget,const QString &text);
 	void signal_createWindow(WebView** webView);

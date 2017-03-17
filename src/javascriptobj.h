@@ -2,6 +2,7 @@
 #define JAVASCRIPTOBJ_H
 
 #include <QObject>
+#include "myfunctions.h"
 //FIXME: remove
 #include <QDebug>
 
@@ -13,7 +14,10 @@ public:
 signals:
 
 public slots:
-	void openTest(const QString &test){qDebug()<<">"<<test;}
+	void importBookmarks();
+	void changeDownloadPath();
+	void toggleVal(const QString &param);
+	void setVal(const QString &param, const QString &value);
 };
 
 #endif // JAVASCRIPTOBJ_H

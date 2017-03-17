@@ -23,10 +23,11 @@ private slots:
 	void slot_findToNewTab();
 	void slot_titleChanged(QWidget *widget, const QString &title);
 	void slot_newWindow(WebView **view);
+	void slot_openMenu();
 private:
 	QLineEdit* m_pFindFiled;
 	QTabWidget* m_pTabs;
-	void newTab(QString url);
+	int newTab(QString url);
 	TabWidget *createTabWidget();
 };
 

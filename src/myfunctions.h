@@ -11,19 +11,21 @@ namespace guiCfg {
 }
 namespace app{
 	const extern QString appVersion;
-	const extern QString urlPreff;
 	extern QString themePage;
 	extern QString dataDir;
+	extern std::map<QString,QString> bookmarks;
 	QString getHtmlPage(const QString &title, const QString &content);
 	void chkDirs();
 	void createDefaultTheme();
 	void createConfig();
+	void saveConf();
 	void loadConf();
+	void loadBookmarksJSON(const QString &file);
 	QString getVal(const QString &param);
 	void setVal(const QString &param, const QString &val);
 	QString getValInArray(const QString &array,const QString &param);
 	void setValInArray(const QString &array,const QString &param, const QString &val);
-	std::map<QString,QString> getArray(const QString &array);
+	std::map<QString, QString> *getArray(const QString &array);
 	const extern QString defaultThemeData;
 }
 

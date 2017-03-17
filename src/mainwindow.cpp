@@ -47,12 +47,19 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(addTabB,&QPushButton::clicked,this,&MainWindow::slot_newTab);
 	connect(m_pFindFiled,&QLineEdit::returnPressed,this,&MainWindow::slot_findToNewTab);
 	connect(findB,&QPushButton::clicked,this,&MainWindow::slot_findToNewTab);
+	connect(menuB,&QPushButton::clicked,this,&MainWindow::slot_openMenu);
+
+	if(app::getVal("openBrowser")=="homePage") newTab(app::getVal("homePage"));
+	if(app::getVal("openBrowser")=="lastTime"){
+		for(auto elem:*app::getArray("lastPages")) newTab(elem.second);
+	}
 }
 void MainWindow::slot_closeTab(int index)
 {
 	if(index==-1) index=m_pTabs->currentIndex();
 	if(m_pTabs->count()<1) return;
 	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(index));
+	if(tabWidget->getUrl()=="about:settings") app::saveConf();
 	tabWidget->stop();
 	tabWidget->deleteLater();
 	m_pTabs->removeTab(index);
@@ -65,18 +72,26 @@ void MainWindow::slot_newWindow(WebView **view)
 	m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
 }
+void MainWindow::slot_openMenu()
+{
+	for(int i=0;i<m_pTabs->count();i++){
+		TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(i));
+		if(tabWidget->getUrl()=="about:settings") return;
+	}
+	m_pTabs->setCurrentIndex(newTab("about:settings"));
+}
 void MainWindow::slot_findToNewTab()
 {
 	if(m_pFindFiled->text().isEmpty()) return;
 	newTab("https://yandex.ru/yandsearch?text="+m_pFindFiled->text()+"&lr=25");
 }
-void MainWindow::newTab(QString url)
+int MainWindow::newTab(QString url)
 {
-	if(url.isEmpty()) url=app::urlPreff+"://bookmarks";
 	TabWidget* tabWidget=createTabWidget();
 	tabWidget->actionUrl(url);
-	m_pTabs->addTab(tabWidget,tr("New Tab"));
+	int index=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
+	return index;
 }
 
 TabWidget* MainWindow::createTabWidget()
@@ -98,5 +113,12 @@ void MainWindow::slot_titleChanged(QWidget *widget, const QString &title)
 }
 MainWindow::~MainWindow()
 {
-
+	if(app::getVal("openBrowser")=="lastTime"){
+		for(int i=0;i<m_pTabs->count();i++){
+			TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(i));
+			if(tabWidget->getUrl()=="about:settings") continue;
+			app::setValInArray("lastPages",QString::number(i),tabWidget->getUrl());
+		}
+	}
+	app::saveConf();
 }

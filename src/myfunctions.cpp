@@ -5,13 +5,14 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QDir>
+#include <QStandardPaths>
 
 namespace guiCfg {
 	const QSize buttonSize(32,32);
 }
 namespace app{
+	bool confEditState=false;
 	const QString appVersion="0.1";
-	const QString urlPreff="mb";
 	QString themePage;
 	QString dataDir;
 	QString confFile;
@@ -49,6 +50,7 @@ namespace app{
 	}
 	void saveConf()
 	{
+		if(!confEditState) return;
 		QFile file(confFile);
 		if (!file.open(QIODevice::WriteOnly)){
 			printf("directory [%s] not writable!\n",dataDir.toStdString().c_str());
@@ -57,10 +59,15 @@ namespace app{
 		QJsonDocument saveDoc(confObj);
 		file.write(saveDoc.toJson());
 		file.close();
+		confEditState=false;
 	}
 	void createConfig()
 	{
 		setVal("theme","default");
+		setVal("switchToTheTab","0");
+		setVal("openBrowser","blank");
+		setVal("homePage","http://drsmyrke-home.pskovline.ru");
+		setVal("downloadPath",QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
 		saveConf();
 	}
 	void loadConf()
@@ -81,6 +88,7 @@ namespace app{
 	{
 		if(param.isEmpty() or val.isEmpty()) return;
 		confObj[param]=val;
+		confEditState=true;
 	}
 	QString getVal(const QString &param)
 	{
@@ -95,21 +103,39 @@ namespace app{
 		QJsonObject inObj=confObj[array].toObject();
 		inObj[param]=val;
 		confObj[array]=inObj;
+		confEditState=true;
 	}
 	QString getValInArray(const QString &array,const QString &param)
 	{
 		QJsonObject inObj=confObj[array].toObject();
 		return inObj[param].toString();
 	}
-	std::map<QString,QString> getArray(const QString &array)
+	std::map<QString,QString>* getArray(const QString &array)
 	{
-		std::map<QString,QString> data;
+		static std::map<QString,QString> data;
 		QJsonObject inObj=confObj[array].toObject();
 		for(auto key:inObj.keys()){
 			QString value=inObj[key].toString();
 			data[key]=value;
 		}
-		return data;
+		return &data;
+	}
+	void loadBookmarksJSON(const QString &file)
+	{
+//		if(!QFile::exists(confFile)) return;
+//		QFile f(file);
+//		if (!f.open(QIODevice::ReadOnly)){
+//			printf("file [%s] not read!\n",file.toStdString().c_str());
+//			return;
+//		}
+//		auto data = f.readAll();
+//		f.close();
+//		QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+//		QJsonObject inObj=loadDoc.object();
+//		QJsonObject::iterator it=inObj.find("uri");
+//		for(it;it!=inObj.end();++it){
+//			qDebug()<<it;
+//		}
 	}
 	void createDefaultTheme(){
 		QFile file(dataDir+"/themes/default");
