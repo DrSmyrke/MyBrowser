@@ -20,14 +20,16 @@ SOURCES += main.cpp\
     WebKit/webview.cpp \
     tabwidget.cpp \
     WebKit/webpage.cpp \
-    javascriptobj.cpp
+    javascriptobj.cpp \
+    genpages.cpp
 
 HEADERS  += mainwindow.h \
     myfunctions.h \
     WebKit/webview.h \
     tabwidget.h \
     WebKit/webpage.h \
-    javascriptobj.h
+    javascriptobj.h \
+    genpages.h
 
 RESOURCES += \
     resources.qrc

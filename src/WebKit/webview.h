@@ -5,6 +5,7 @@
 #include <QtWebKit>
 #include <QtWebKitWidgets/QWebView>
 #include "webpage.h"
+#include "myfunctions.h"
 
 class WebView : public QWebView
 {

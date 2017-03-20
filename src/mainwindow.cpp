@@ -69,8 +69,11 @@ void MainWindow::slot_newWindow(WebView **view)
 {
 	TabWidget* tabWidget=createTabWidget();
 	(*view) = tabWidget->getView();
-	m_pTabs->addTab(tabWidget,tr("New Tab"));
+	int num=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
+	if(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true"){
+		m_pTabs->setCurrentIndex(num);
+	}
 }
 void MainWindow::slot_openMenu()
 {
@@ -91,6 +94,9 @@ int MainWindow::newTab(QString url)
 	tabWidget->actionUrl(url);
 	int index=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
+	if(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true"){
+		m_pTabs->setCurrentIndex(index);
+	}
 	return index;
 }
 

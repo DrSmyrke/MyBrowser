@@ -31,16 +31,17 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		goB->setMaximumSize(guiCfg::buttonSize);
 		connect(goB,&QPushButton::clicked,this,&TabWidget::slot_goToUrl);
 	m_pReloadB=new QPushButton();
-			m_pReloadB->setIcon(QIcon("://images/view-refresh.svg"));
-			m_pReloadB->setMaximumSize(guiCfg::buttonSize);
-			connect(m_pReloadB,&QPushButton::clicked,m_pWebView,&WebView::reload);
+		m_pReloadB->setIcon(QIcon("://images/view-refresh.svg"));
+		m_pReloadB->setMaximumSize(guiCfg::buttonSize);
+		connect(m_pReloadB,&QPushButton::clicked,m_pWebView,&WebView::reload);
 	m_pStopB=new QPushButton();
-			m_pStopB->setIcon(QIcon("://images/window-close.svg"));
-			m_pStopB->setMaximumSize(guiCfg::buttonSize);
-			connect(m_pStopB,&QPushButton::clicked,m_pWebView,&WebView::stop);
+		m_pStopB->setIcon(QIcon("://images/window-close.svg"));
+		m_pStopB->setMaximumSize(guiCfg::buttonSize);
+		connect(m_pStopB,&QPushButton::clicked,m_pWebView,&WebView::stop);
 	QPushButton* goHomeB=new QPushButton();
-			goHomeB->setIcon(QIcon("://images/go-home.svg"));
-			goHomeB->setMaximumSize(guiCfg::buttonSize);
+		goHomeB->setIcon(QIcon("://images/go-home.svg"));
+		goHomeB->setMaximumSize(guiCfg::buttonSize);
+		connect(goHomeB,&QPushButton::clicked,this,[this](){m_pWebView->load(app::getVal("homePage"));});
 	m_pStatusLabel=new QLabel();
 
 	m_pInspector=new QWebInspector(this);
@@ -78,33 +79,12 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 
 void TabWidget::actionUrl(const QString &url)
 {
-	QString SPACE="&#160;&#160;&#160;";
 	QString addr=url;
 	if(url.isEmpty()) addr="about:blank";
 	if(addr.toLower()=="about:settings"){
 		JavaScriptObj* obj=new JavaScriptObj();
 		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("settings",obj);
-		std::map<QString,QString> atStarting;
-			atStarting[tr("Show home page")]="homePage";
-			atStarting[tr("Show blank page")]="blank";
-			atStarting[tr("Show tabs opened last time")]="lastTime";
-		QString atStartingVals;
-		for(auto elem:atStarting){
-			QString selected=(app::getVal("openBrowser")==elem.second)?" selected":"";
-			atStartingVals+="<option label=\""+elem.first+"\" value=\""+elem.second+"\""+selected+">"+elem.first+"</option>";
-		}
-		QString switchToTheTab=(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true")?"bon":"boff";
-		QString content="<div class=\"cbox\">\n"
-				"<b>"+tr("Starting")+"</b><br>\n"
-				+SPACE+tr("At startup:")+" <select onChange=\"settings.setVal('openBrowser',this.value);\">"+atStartingVals+"</select><br>\n"
-				+SPACE+tr("Home page:")+" <input type=\"text\" size=\"30\" onChange=\"settings.setVal('homePage',this.value);\" onKeyUp=\"settings.setVal('homePage',this.value);\" value=\""+app::getVal("homePage")+"\"><br>\n"
-				"<b>"+tr("Downloads")+"</b><br>\n"
-				+SPACE+tr("The path to save files:")+" <input type=\"text\" size=\"30\" readonly value=\""+app::getVal("downloadPath")+"\"> <input type=\"button\" value=\""+tr("Change")+"\" onClick=\"settings.changeDownloadPath();\"><br>\n"
-				"<b>"+tr("Tabs")+"</b><br>\n"
-				+SPACE+"<div class=\""+switchToTheTab+"\" onClick=\"settings.toggleVal('switchToTheTab');this.className=(this.className='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\">"+tr("Switch to the tab that opens")+"</span><br>\n"
-
-				"</div>\n";
-		m_pWebView->setHtml(app::getHtmlPage(tr("SETTINGS"),content),QUrl(url));
+		m_pWebView->setHtml(app::getHtmlPage(tr("SETTINGS"),gp::getSettings()),QUrl(url));
 		slot_titleChanged(tr("SETTINGS"));
 		return;
 	}

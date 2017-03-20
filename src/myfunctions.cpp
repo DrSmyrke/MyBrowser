@@ -65,6 +65,10 @@ namespace app{
 	{
 		setVal("theme","default");
 		setVal("switchToTheTab","0");
+		setVal("autoLoadImages","1");
+		setVal("enableLocalStorage","1");
+		setVal("historySave","0");
+		setVal("enableJavaApplets","0");
 		setVal("openBrowser","blank");
 		setVal("homePage","http://drsmyrke-home.pskovline.ru");
 		setVal("downloadPath",QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));

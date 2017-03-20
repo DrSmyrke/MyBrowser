@@ -5,6 +5,24 @@ WebView::WebView(QWidget *parent) : QWebView(parent)
 	m_pWebPage= new WebPage(this);
 		m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
+
+		if(app::getVal("autoLoadImages")=="1" or app::getVal("autoLoadImages")=="true"){
+			m_pWebPage->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
+		}else{
+			m_pWebPage->settings()->setAttribute(QWebSettings::AutoLoadImages,false);
+		}
+
+		if(app::getVal("enableJavaApplets")=="1" or app::getVal("enableJavaApplets")=="true"){
+			m_pWebPage->settings()->setAttribute(QWebSettings::JavaEnabled,true);
+		}else{
+			m_pWebPage->settings()->setAttribute(QWebSettings::JavaEnabled,false);
+		}
+
+		if(app::getVal("enableLocalStorage")=="1" or app::getVal("enableLocalStorage")=="true"){
+			m_pWebPage->settings()->setAttribute(QWebSettings::LocalStorageEnabled,true);
+		}else{
+			m_pWebPage->settings()->setAttribute(QWebSettings::LocalStorageEnabled,false);
+		}
 		//m_pWebPage->setLinkDelegationPolicy(QWebPage::DelegateExternalLinks);
 		connect(m_pWebPage,&WebPage::linkHovered,this,&WebView::signal_linkHovered);
 	setPage(m_pWebPage);
