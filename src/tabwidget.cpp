@@ -6,10 +6,11 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		connect(m_pWebView,&WebView::signal_linkHovered,this,&TabWidget::slot_linkHovered);
 		connect(m_pWebView,&WebView::titleChanged,this,&TabWidget::slot_titleChanged);
 		connect(m_pWebView,&WebView::loadFinished,this,&TabWidget::slot_loadFinished);
-		connect(m_pWebView,&WebView::urlChanged,this,&TabWidget::slot_loadFinished);
+		connect(m_pWebView,&WebView::urlChanged,this,&TabWidget::slot_urlChanged);
 		connect(m_pWebView,&WebView::loadProgress,this,&TabWidget::slot_loadProgress);
 		connect(m_pWebView,&WebView::linkClicked,this,&TabWidget::slot_linkClicked);
 		connect(m_pWebView,&WebView::signal_createWindow,this,&TabWidget::signal_createWindow);
+		connect(m_pWebView,&WebView::signal_printRequested,this,&TabWidget::signal_printRequested);
 
 	m_pProgressBar=new QProgressBar();
 		m_pProgressBar->setMaximumSize(100,16);
@@ -147,6 +148,23 @@ void TabWidget::slot_loadFinished()
 	if(m_pNextB->isVisible()) m_pNextB->hide();
 	if(m_pWebView->history()->canGoBack()) m_pPrefB->show();
 	if(m_pWebView->history()->canGoForward()) m_pNextB->show();
+
+	if(app::getVal("historySave")=="1" or app::getVal("historySave")=="true"){
+		if(!QFile::exists(app::dataDir+"/history")) QDir().mkdir(app::dataDir+"/history");
+		if(QFile::exists(app::dataDir+"/history")){
+			auto currentDate = QDate::currentDate().toString("yyyy/MM");
+			auto currentDay = QDate::currentDate().toString("dd");
+			auto time=QTime::currentTime().toString("hh:mm");
+			if(!QFile::exists(app::dataDir+"/history/"+currentDate)) QDir().mkpath(app::dataDir+"/history/"+currentDate);
+			if(QFile::exists(app::dataDir+"/history/"+currentDate)){
+				QFile file(app::dataDir+"/history/"+currentDate+"/"+currentDay+".log");
+				if(file.open(QIODevice::WriteOnly | QIODevice::Append)){
+					file.write(QString(time+"	"+m_pWebView->title()+"	"+m_pWebView->url().toString()+"\n").toStdString().c_str());
+					file.close();
+				}
+			}
+		}
+	}
 }
 void TabWidget::slot_loadProgress(int prz)
 {
@@ -154,9 +172,5 @@ void TabWidget::slot_loadProgress(int prz)
 }
 void TabWidget::slot_urlChanged(const QUrl &url)
 {
-	m_pUrlField->setText(m_pWebView->url().toString());
-}
-void TabWidget::reload()
-{
-	m_pWebView->reload();
+	m_pUrlField->setText(url.toString());
 }

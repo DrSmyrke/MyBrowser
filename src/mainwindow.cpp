@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 			QPushButton* printB=new QPushButton();
 				printB->setIcon(QIcon::fromTheme("document-print",QIcon("://images/document-print.svg")));
 				printB->setMaximumSize(guiCfg::buttonSize);
+				connect(printB,&QPushButton::clicked,this,&MainWindow::slot_printPage);
 		box->addWidget(printB,0,1);
 			QPushButton* addTabB=new QPushButton();
 				addTabB->setIcon(QIcon("://images/tab-new.svg"));
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(menuB,&QPushButton::clicked,this,&MainWindow::slot_openMenu);
 
 	if(app::getVal("openBrowser")=="homePage") newTab(app::getVal("homePage"));
+	if(app::getVal("openBrowser")=="blank") newTab("");
 	if(app::getVal("openBrowser")=="lastTime"){
 		for(auto elem:*app::getArray("lastPages")) newTab(elem.second);
 	}
@@ -83,6 +85,23 @@ void MainWindow::slot_openMenu()
 	}
 	m_pTabs->setCurrentIndex(newTab("about:settings"));
 }
+void MainWindow::slot_printPage()
+{
+	if (!m_pTabs->currentIndex()) return;
+	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(m_pTabs->currentIndex()));
+	slot_printRequested(tabWidget->getView()->page()->mainFrame());
+}
+void MainWindow::slot_printRequested(QWebFrame *frame)
+{
+	qDebug()<<"sdfdf";
+	QPrinter printer;
+	QPrintDialog *dialog = new QPrintDialog(&printer, this);
+	dialog->setWindowTitle(tr("Print Document"));
+	dialog->setLocale(QLocale::system());
+	if (dialog->exec() != QDialog::Accepted)
+		return;
+	frame->print(&printer);
+}
 void MainWindow::slot_findToNewTab()
 {
 	if(m_pFindFiled->text().isEmpty()) return;
@@ -105,6 +124,7 @@ TabWidget* MainWindow::createTabWidget()
 	TabWidget* tabWidget=new TabWidget();
 	connect(tabWidget,&TabWidget::signal_titleChanged,this,&MainWindow::slot_titleChanged);
 	connect(tabWidget,&TabWidget::signal_createWindow,this,&MainWindow::slot_newWindow);
+	connect(tabWidget,&TabWidget::signal_printRequested,this,&MainWindow::slot_printRequested);
 	return tabWidget;
 }
 void MainWindow::slot_titleChanged(QWidget *widget, const QString &title)

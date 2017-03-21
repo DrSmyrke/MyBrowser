@@ -22,7 +22,6 @@ class TabWidget : public QWidget
 public:
 	explicit TabWidget(QWidget *parent = 0);
 	void load(const QUrl &url);
-	void reload();
 	void actionUrl(const QString &url);
 	WebView* getView(){ return m_pWebView; }
 	void stop(){m_pWebView->stop();}
@@ -30,6 +29,7 @@ public:
 signals:
 	void signal_titleChanged(QWidget* widget,const QString &text);
 	void signal_createWindow(WebView** webView);
+	void signal_printRequested(QWebFrame *frame);
 private slots:
 	void slot_titleChanged(const QString &title);
 	void slot_urlChanged(const QUrl &url);

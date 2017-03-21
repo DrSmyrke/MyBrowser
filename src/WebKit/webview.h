@@ -4,6 +4,7 @@
 #include <QAction>
 #include <QtWebKit>
 #include <QtWebKitWidgets/QWebView>
+#include <QtWebKitWidgets/QWebFrame>
 #include "webpage.h"
 #include "myfunctions.h"
 
@@ -15,6 +16,7 @@ public:
 signals:
 	void signal_linkHovered(const QString &link);
 	void signal_createWindow(WebView** webView);
+	void signal_printRequested(QWebFrame * frame);
 private:
 	WebPage* m_pWebPage;
 

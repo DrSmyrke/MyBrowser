@@ -25,6 +25,7 @@ WebView::WebView(QWidget *parent) : QWebView(parent)
 		}
 		//m_pWebPage->setLinkDelegationPolicy(QWebPage::DelegateExternalLinks);
 		connect(m_pWebPage,&WebPage::linkHovered,this,&WebView::signal_linkHovered);
+		connect(m_pWebPage,&WebPage::printRequested,this,&WebView::signal_printRequested);
 	setPage(m_pWebPage);
 }
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
