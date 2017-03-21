@@ -11,32 +11,41 @@ MainWindow::MainWindow(QWidget *parent)
 		box->setContentsMargins(0,3,0,0);
 		//top panel
 			QPushButton* menuB=new QPushButton();
-				menuB->setIcon(QIcon("://images/applications-system.svg"));
+				menuB->setIcon(QIcon("://images/system.svg"));
 				menuB->setMaximumSize(guiCfg::buttonSize);
 		box->addWidget(menuB,0,0);
 			QPushButton* printB=new QPushButton();
-				printB->setIcon(QIcon::fromTheme("document-print",QIcon("://images/document-print.svg")));
+				printB->setIcon(QIcon("://images/print.svg"));
 				printB->setMaximumSize(guiCfg::buttonSize);
+				printB->setShortcut(QKeySequence::Print);
 				connect(printB,&QPushButton::clicked,this,&MainWindow::slot_printPage);
 		box->addWidget(printB,0,1);
+			QPushButton* downloadsB=new QPushButton();
+				downloadsB->setIcon(QIcon("://images/save.svg"));
+				downloadsB->setMaximumSize(guiCfg::buttonSize);
+		box->addWidget(downloadsB,0,2);
 			QPushButton* addTabB=new QPushButton();
 				addTabB->setIcon(QIcon("://images/tab-new.svg"));
 				addTabB->setMaximumSize(guiCfg::buttonSize);
-		box->addWidget(addTabB,0,2);
+		box->addWidget(addTabB,0,3);
 			m_pFindFiled=new QLineEdit();
 				m_pFindFiled->setPlaceholderText(tr("Find text"));
 				m_pFindFiled->setMaximumWidth(200);
-		box->addWidget(m_pFindFiled,0,3);
+		box->addWidget(m_pFindFiled,0,4);
 			QPushButton* findB=new QPushButton();
-				findB->setIcon(QIcon("://images/edit-find.svg"));
+				findB->setIcon(QIcon("://images/find.svg"));
 
 				findB->setMaximumSize(guiCfg::buttonSize);
-		box->addWidget(findB,0,4);
+		box->addWidget(findB,0,5);
 		//body
 			m_pTabs=new QTabWidget();
 			m_pTabs->setTabsClosable(false);
 			m_pTabs->setMovable(true);
 			m_pTabs->setElideMode(Qt::ElideMiddle);
+			QAction* closeTab=new QAction(this);
+				closeTab->setShortcut(QKeySequence::Close);
+				connect(closeTab,&QAction::triggered,this,[this](){slot_closeTab(m_pTabs->currentIndex());});
+			m_pTabs->addAction(closeTab);
 		box->addWidget(m_pTabs,1,0,1,10);
 		//bottom
 	centrWidget->setLayout(box);
@@ -59,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::slot_closeTab(int index)
 {
 	if(index==-1) index=m_pTabs->currentIndex();
-	if(m_pTabs->count()<1) return;
+	if(m_pTabs->count()<2) return;
 	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(index));
 	if(tabWidget->getUrl()=="about:settings") app::saveConf();
 	tabWidget->stop();
@@ -71,10 +80,10 @@ void MainWindow::slot_newWindow(WebView **view)
 {
 	TabWidget* tabWidget=createTabWidget();
 	(*view) = tabWidget->getView();
-	int num=m_pTabs->addTab(tabWidget,tr("New Tab"));
+	int index=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
 	if(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true"){
-		m_pTabs->setCurrentIndex(num);
+		m_pTabs->setCurrentIndex(index);
 	}
 }
 void MainWindow::slot_openMenu()
@@ -93,7 +102,6 @@ void MainWindow::slot_printPage()
 }
 void MainWindow::slot_printRequested(QWebFrame *frame)
 {
-	qDebug()<<"sdfdf";
 	QPrinter printer;
 	QPrintDialog *dialog = new QPrintDialog(&printer, this);
 	dialog->setWindowTitle(tr("Print Document"));

@@ -1,15 +1,16 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/applications-system.svg</file>
-        <file>images/dialog-apply.svg</file>
-        <file>images/document-print.svg</file>
-        <file>images/edit-find.svg</file>
-        <file>images/go-home.svg</file>
-        <file>images/help-about.svg</file>
+        <file>images/system.svg</file>
+        <file>images/apply.svg</file>
+        <file>images/print.svg</file>
+        <file>images/find.svg</file>
+        <file>images/home.svg</file>
+        <file>images/about.svg</file>
         <file>images/tab-new.svg</file>
-        <file>images/view-refresh.svg</file>
-        <file>images/window-close.svg</file>
-        <file>images/go-next.svg</file>
-        <file>images/go-previous.svg</file>
+        <file>images/refresh.svg</file>
+        <file>images/close.svg</file>
+        <file>images/next.svg</file>
+        <file>images/previous.svg</file>
+        <file>images/save.svg</file>
     </qresource>
 </RCC>
