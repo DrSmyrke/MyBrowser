@@ -11,6 +11,7 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		connect(m_pWebView,&WebView::linkClicked,this,&TabWidget::slot_linkClicked);
 		connect(m_pWebView,&WebView::signal_createWindow,this,&TabWidget::signal_createWindow);
 		connect(m_pWebView,&WebView::signal_printRequested,this,&TabWidget::signal_printRequested);
+		//connect(m_pWebView,&WebView::,this,&TabWidget::slot_customContextMenuRequested);
 
 	m_pProgressBar=new QProgressBar();
 		m_pProgressBar->setMaximumSize(100,16);
@@ -43,6 +44,58 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		goHomeB->setIcon(QIcon("://images/home.svg"));
 		goHomeB->setMaximumSize(guiCfg::buttonSize);
 		connect(goHomeB,&QPushButton::clicked,this,[this](){m_pWebView->load(app::getVal("homePage"));});
+	QPushButton* goFindB=new QPushButton();
+		goFindB->setIcon(QIcon("://images/find.svg"));
+		goFindB->setMaximumSize(guiCfg::buttonSize);
+		goFindB->setShortcut(QKeySequence::Find);
+		connect(goFindB,&QPushButton::clicked,this,[this](){
+			if(!m_pFindBox->isVisible()) m_pFindBox->show();
+			m_pTextFind->clear();
+			m_pTextFind->setFocus();
+			m_pFindAll->setChecked(false);
+		});
+	//find panel
+	m_pFindBox=new QWidget();
+		m_pFindBox->hide();
+		QHBoxLayout* findBoxLayout=new QHBoxLayout();
+			findBoxLayout->setSpacing(1);
+			findBoxLayout->setContentsMargins(0,0,0,0);
+				m_pTextFind=new QLineEdit(this);
+					m_pTextFind->setPlaceholderText(tr("Search by page"));
+					connect(m_pTextFind,&QLineEdit::textChanged,this,&TabWidget::slot_fintText);
+			findBoxLayout->addWidget(m_pTextFind);
+				QPushButton* findBackB=new QPushButton();
+					findBackB->setIcon(QIcon("://images/previous.svg"));
+					findBackB->setMaximumSize(guiCfg::buttonSize);
+					findBackB->setShortcut(QKeySequence::FindPrevious);
+					connect(findBackB,&QPushButton::clicked,this,[this](){
+						m_pWebView->findText(m_pTextFind->text(),QWebPage::FindBackward);
+					});
+			findBoxLayout->addWidget(findBackB);
+				QPushButton* findNextB=new QPushButton();
+					findNextB->setIcon(QIcon("://images/next.svg"));
+					findNextB->setMaximumSize(guiCfg::buttonSize);
+					findNextB->setShortcut(QKeySequence::FindNext);
+					connect(findNextB,&QPushButton::clicked,this,[this](){
+						m_pWebView->findText(m_pTextFind->text());
+					});
+			findBoxLayout->addWidget(findNextB);
+				m_pFindAll=new QCheckBox(tr("Select all found items"));
+				connect(m_pFindAll,&QCheckBox::stateChanged,this,[this](int state){
+					if(state==Qt::Checked){
+						m_pWebView->findText(m_pTextFind->text(),QWebPage::HighlightAllOccurrences);
+					}else{
+						m_pWebView->findText("",QWebPage::HighlightAllOccurrences);
+					}
+				});
+			findBoxLayout->addWidget(m_pFindAll);
+				QPushButton* findCloseB=new QPushButton();
+					findCloseB->setIcon(QIcon("://images/close.svg"));
+					findCloseB->setMaximumSize(guiCfg::buttonSize);
+					connect(findCloseB,&QPushButton::clicked,m_pFindBox,&QWidget::hide);
+			findBoxLayout->addWidget(findCloseB);
+	m_pFindBox->setLayout(findBoxLayout);
+
 	m_pStatusLabel=new QLabel();
 
 	m_pInspector=new QWebInspector(this);
@@ -63,7 +116,9 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 			boxTop->addWidget(m_pReloadB);
 			boxTop->addWidget(m_pStopB);
 			boxTop->addWidget(goHomeB);
+			boxTop->addWidget(goFindB);
 		box->addLayout(boxTop);
+		box->addWidget(m_pFindBox);
 
 
 		box->addWidget(splitter);
@@ -84,6 +139,8 @@ void TabWidget::actionUrl(const QString &url)
 	if(url.isEmpty()) addr="about:blank";
 	if(addr.toLower()=="about:settings"){
 		JavaScriptObj* obj=new JavaScriptObj();
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
 		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("settings",obj);
 		m_pWebView->setHtml(app::getHtmlPage(tr("SETTINGS"),gp::getSettings()),QUrl(url));
 		slot_titleChanged(tr("SETTINGS"));
@@ -91,6 +148,8 @@ void TabWidget::actionUrl(const QString &url)
 	}
 	if(addr.toLower()=="about:bookmarks"){
 		JavaScriptObj* obj=new JavaScriptObj();
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
 		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("button",obj);
 		QString content="<div class=\"cbox\">\n"
 				"<a href=\"javascript:button.importBookmarks();\">[Импорт закладок]</a>"
@@ -100,6 +159,8 @@ void TabWidget::actionUrl(const QString &url)
 		return;
 	}
 	if(addr.toLower()=="about:me"){
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
+		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
 		QString content="<script type=\"text/javascript\">var line=\"Developer: Dr.Smyrke [Smyrke2005@yandex.ru]<br>Engine: QT/Webkit<br>Language: C++<br>Application version: "+app::appVersion+"<br>\";var speed=100;var i=0;function init(){if(i++<line.length){document.getElementById(\"text\").innerHTML=line.substring(0,i);setTimeout(\'init()\',speed);}}</script><div class=\"cbox\"><span id=\"text\" class=\"valgreen\" style=\"font-family:\'Courier New\',\'Terminus\',\'Monospace\'\"></span></div><script type=\"text/javascript\">init();</script>";
 		m_pWebView->setHtml(app::getHtmlPage(tr("ABOUT"),content),QUrl(url));
 		slot_titleChanged(tr("ABOUT"));
@@ -121,6 +182,14 @@ void TabWidget::slot_linkHovered(const QString &link)
 	QFont font;
 	QFontMetrics metrix(font);
 	m_pStatusLabel->setText(metrix.elidedText(link,Qt::ElideMiddle,m_pStatusLabel->geometry().width()));
+}
+void TabWidget::slot_fintText(const QString &text)
+{
+	if(m_pFindAll->checkState()==Qt::Checked){
+		m_pWebView->findText("",QWebPage::HighlightAllOccurrences);
+		m_pFindAll->setChecked(false);
+	}
+	m_pWebView->findText(text);
 }
 void TabWidget::slot_goToUrl()
 {

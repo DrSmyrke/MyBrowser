@@ -14,6 +14,7 @@ namespace gp {
 			atStartingVals+="<option label=\""+elem.first+"\" value=\""+elem.second+"\""+selected+">"+elem.first+"</option>";
 		}
 		QString switchToTheTab=(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true")?"bon":"boff";
+		QString enableJavascript=(app::getVal("enableJavascript")=="1" or app::getVal("enableJavascript")=="true")?"bon":"boff";
 		QString autoLoadImages=(app::getVal("autoLoadImages")=="1" or app::getVal("autoLoadImages")=="true")?"bon":"boff";
 		QString enableJavaApplets=(app::getVal("enableJavaApplets")=="1" or app::getVal("enableJavaApplets")=="true")?"bon":"boff";
 		QString enableLocalStorage=(app::getVal("enableLocalStorage")=="1" or app::getVal("enableLocalStorage")=="true")?"bon":"boff";
@@ -29,6 +30,7 @@ namespace gp {
 						"</table>"
 						"<b>"+QObject::tr("Browser")+"</b><br><table>\n"
 						"<tr><td><div class=\""+autoLoadImages+"\" onClick=\"settings.toggleVal('autoLoadImages');this.className=(this.className=='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\"></td><td>"+QObject::tr("Load images automatically")+"</span></td></tr>\n"
+						"<tr><td><div class=\""+enableJavascript+"\" onClick=\"settings.toggleVal('enableJavascript');this.className=(this.className=='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\"></td><td>"+QObject::tr("Enable Javascript")+"</span></td></tr>\n"
 						"<tr><td><div class=\""+enableJavaApplets+"\" onClick=\"settings.toggleVal('enableJavaApplets');this.className=(this.className=='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\"></td><td>"+QObject::tr("Support for the Java applet tag")+"</span></td></tr>\n"
 						"<tr><td><div class=\""+enableLocalStorage+"\" onClick=\"settings.toggleVal('enableLocalStorage');this.className=(this.className=='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\"></td><td>"+QObject::tr("Local Storage Support")+"</span></td></tr>\n"
 						"<tr><td><div class=\""+historySave+"\" onClick=\"settings.toggleVal('historySave');this.className=(this.className=='bon')?'boff':'bon';\"></div><span style=\"font-size:12pt;\"></td><td>"+QObject::tr("Saving history")+"</span></td></tr>\n"

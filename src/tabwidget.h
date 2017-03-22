@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QSplitter>
+#include <QCheckBox>
 #include <QWebInspector>
 #include <QWebFrame>
 
@@ -38,16 +39,20 @@ private slots:
 	void slot_loadProgress(int prz);
 	void slot_goToUrl();
 	void slot_linkHovered(const QString &link);
+	void slot_fintText(const QString &text);
 private:
 	WebView* m_pWebView;
 	QWebInspector* m_pInspector;
 	QProgressBar* m_pProgressBar;
 	QLineEdit* m_pUrlField;
+	QLineEdit* m_pTextFind;
 	QPushButton* m_pPrefB;
 	QPushButton* m_pNextB;
 	QPushButton* m_pStopB;
 	QPushButton* m_pReloadB;
 	QLabel* m_pStatusLabel;
+	QWidget* m_pFindBox;
+	QCheckBox* m_pFindAll;
 	void titleChanged(const QString &title);
 };
 

@@ -8,7 +8,7 @@
 #include <QStandardPaths>
 
 namespace guiCfg {
-	const QSize buttonSize(32,32);
+	const QSize buttonSize(30,30);
 }
 namespace app{
 	bool confEditState=false;
@@ -69,6 +69,7 @@ namespace app{
 		setVal("enableLocalStorage","1");
 		setVal("historySave","0");
 		setVal("enableJavaApplets","0");
+		setVal("enableJavascript","1");
 		setVal("openBrowser","blank");
 		setVal("homePage","http://drsmyrke-home.pskovline.ru");
 		setVal("downloadPath",QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
@@ -161,6 +162,9 @@ namespace app{
 								   "	a{\n"
 								   "		outline:none;-webkit-transition-property:color;-webkit-transition-duration:1s;transition-property:color;\n"
 								   "		transition-duration:1s;color:#999999;text-decoration:none;font-size:10pt;\n"
+								   "	}\n"
+								   "	input[type=text]{\n"
+								   "		padding:5px;\n"
 								   "	}\n"
 								   "	a:active{position:relative;top:1px;left:1px;}\n"
 								   "	b,.b{text-shadow:0px 0px 5px #FFCF7D;}\n"

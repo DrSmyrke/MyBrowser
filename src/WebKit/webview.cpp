@@ -3,8 +3,13 @@
 WebView::WebView(QWidget *parent) : QWebView(parent)
 {
 	m_pWebPage= new WebPage(this);
-		m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
+
+		if(app::getVal("enableJavascript")=="1" or app::getVal("enableJavascript")=="true"){
+			m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
+		}else{
+			m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,false);
+		}
 
 		if(app::getVal("autoLoadImages")=="1" or app::getVal("autoLoadImages")=="true"){
 			m_pWebPage->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
