@@ -17,6 +17,7 @@ namespace app{
 	QString themePage;
 	QString dataDir;
 	QString confFile;
+	QString bookmarksFile;
 	QJsonObject confObj;
 	QJsonObject bookmarksObj;
 
@@ -29,11 +30,13 @@ namespace app{
 	}
 	void chkDirs()
 	{
-		confFile=dataDir+"/config.conf";
+		confFile=dataDir+"/config";
+		bookmarksFile=dataDir+"/bookmarks";
 		if(!QFile::exists(dataDir)) QDir().mkdir(dataDir);
 		if(!QFile::exists(dataDir+"/themes")) QDir().mkdir(dataDir+"/themes");
 		if(!QFile::exists(dataDir+"/themes/default")) createDefaultTheme();
 		loadConf();
+		if(QFile::exists(bookmarksFile)) loadBookmarks();
 		if(getVal("theme")=="default"){
 			themePage=defaultThemeData;
 		}else{
@@ -55,7 +58,7 @@ namespace app{
 		if(!confEditState) return;
 		QFile file(confFile);
 		if (!file.open(QIODevice::WriteOnly)){
-			printf("directory [%s] not writable!\n",dataDir.toStdString().c_str());
+			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Cannot save config file!"));
 			return;
 		}
 		QJsonDocument saveDoc(confObj);
@@ -82,7 +85,7 @@ namespace app{
 		if(!QFile::exists(confFile)) createConfig();
 		QFile file(confFile);
 		if (!file.open(QIODevice::ReadOnly)){
-			printf("file [%s] not read!\n",confFile.toStdString().c_str());
+			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Unable to open config file"));
 			return;
 		}
 		auto confData = file.readAll();
@@ -137,13 +140,73 @@ namespace app{
 		}
 		auto data = QString(f.readAll());
 		f.close();
-		if(data.contains("\"guid\":",Qt::CaseInsensitive)){	//JSON file
-			QJsonDocument loadDoc(QJsonDocument::fromJson(data.toLatin1()));
-			QJsonObject inObj=loadDoc.object();
-			for(auto elem:inObj.toVariantMap().toStdMap()){
-				qDebug()<<elem.first<<elem.second;
+		data.replace("\n","");
+		data.replace("  "," ");
+		data.replace("	","");
+		if(data.contains("\"uri\":",Qt::CaseInsensitive)){	//JSON file
+			QString title;
+			QString uri;
+			for(auto elem:data.split(",")){
+				auto tmp=elem.split("\":\"");
+				if(tmp[0].indexOf("{",Qt::CaseInsensitive)==0) tmp[0].remove(0,1);
+				if(tmp[0].indexOf("\"",Qt::CaseInsensitive)==0) tmp[0].remove(0,1);
+				if(tmp[0].contains("title",Qt::CaseInsensitive) and tmp.size()>1){
+					if(tmp[1].indexOf("\"",Qt::CaseInsensitive)==tmp[1].length()-1) tmp[1].remove(tmp[1].length()-1,1);
+					auto tmp2=tmp[1].split("\"}");
+					title=tmp2[0];
+				}
+				if(tmp[0].contains("uri",Qt::CaseInsensitive) and tmp.size()>1){
+					if(tmp[1].indexOf("\"",Qt::CaseInsensitive)==tmp[1].length()-1) tmp[1].remove(tmp[1].length()-1,1);
+					auto tmp2=tmp[1].split("\"}");
+					uri=tmp2[0];
+					addUnsortBookmark(uri,title);
+				}
 			}
+			saveBookmarks();
 		}
+	}
+	void addUnsortBookmark(const QString &param, const QString &val)
+	{
+		if(param.isEmpty() or val.isEmpty()) return;
+		QJsonObject inObj=bookmarksObj["unsort"].toObject();
+		inObj[param]=val;
+		bookmarksObj["unsort"]=inObj;
+	}
+	std::map<QString,QString>* getArrayBookmark(const QString &array)
+	{
+		static std::map<QString,QString> data;
+		QJsonObject inObj=bookmarksObj[array].toObject();
+		for(auto key:inObj.keys()){
+			QString value=inObj[key].toString();
+			data[key]=value;
+		}
+		return &data;
+	}
+	void loadBookmarks()
+	{
+		if(!QFile::exists(bookmarksFile)) return;
+		QFile file(bookmarksFile);
+		if (!file.open(QIODevice::ReadOnly)){
+			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Unable to open bookmarks file"));
+			return;
+		}
+		auto data = file.readAll();
+		file.close();
+		QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+		bookmarksObj=loadDoc.object();
+	}
+	void saveBookmarks()
+	{
+		//if(!confEditState) return;
+		QFile file(bookmarksFile);
+		if (!file.open(QIODevice::WriteOnly)){
+			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Cannot save config file!"));
+			return;
+		}
+		QJsonDocument saveDoc(bookmarksObj);
+		file.write(saveDoc.toJson());
+		file.close();
+		//confEditState=false;
 	}
 	void createDefaultTheme(){
 		QFile file(dataDir+"/themes/default");

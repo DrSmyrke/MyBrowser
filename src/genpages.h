@@ -7,6 +7,7 @@
 namespace gp {
 	QString getSettings();
 	QString getAbout();
+	QString getBookmarks();
 }
 
 #endif // GENPAGES_H

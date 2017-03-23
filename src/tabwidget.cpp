@@ -152,10 +152,7 @@ void TabWidget::actionUrl(const QString &url)
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
 		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("button",obj);
-		QString content="<div class=\"cbox\">\n"
-				"<a href=\"javascript:button.importBookmarks();\">[Импорт закладок]</a>"
-				"</div>\n";
-		m_pWebView->setHtml(app::getHtmlPage(tr("BOOKMARKS"),content),QUrl(url));
+		m_pWebView->setHtml(app::getHtmlPage(tr("BOOKMARKS"),gp::getBookmarks()),QUrl(url));
 		slot_titleChanged(tr("BOOKMARKS"));
 		return;
 	}

@@ -21,6 +21,10 @@ namespace app{
 	void saveConf();
 	void loadConf();
 	void importBookmarks(const QString &file);
+	void addUnsortBookmark(const QString &param, const QString &val);
+	std::map<QString,QString>* getArrayBookmark(const QString &array);
+	void loadBookmarks();
+	void saveBookmarks();
 	QString getVal(const QString &param);
 	void setVal(const QString &param, const QString &val);
 	QString getValInArray(const QString &array,const QString &param);

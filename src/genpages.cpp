@@ -1,9 +1,9 @@
 #include "genpages.h"
 
 namespace gp {
+	const QString SPACE="&#160;&#160;&#160;";
 	QString getSettings()
 	{
-		QString SPACE="&#160;&#160;&#160;";
 		std::map<QString,QString> atStarting;
 			atStarting[QObject::tr("Show home page")]="homePage";
 			atStarting[QObject::tr("Show blank page")]="blank";
@@ -49,6 +49,23 @@ namespace gp {
 				+app::version+"<br>\";var speed=100;var i=0;function init(){if(i++<line.length){document.getElementById(\"text\").innerHTML=line.substring(0,i);setTimeout(\'init()\',speed);}}</script>"
 				"<div class=\"cbox\"><span id=\"text\" class=\"valgreen\" style=\"font-family:\'Courier New\',\'Terminus\',\'Monospace\'\"></span></div>"
 				"<script type=\"text/javascript\">init();</script>";
+		return content;
+	}
+	QString getBookmarks()
+	{
+		QString content;
+		if(app::getArrayBookmark("unsort")->size()>0){
+			content+="<b>"+QObject::tr("Unsorting")+"</b><br>\n";
+			content+="<div class=\"cbox\">\n"
+					 "<table border=1>\n";
+			for(auto elem:*app::getArrayBookmark("unsort")){
+				content+="<tr><td><a href=\""+elem.first+"\" target=\"_blank\">"+elem.second+"</a></td><td>N/A</td></tr>\n";
+			}
+			content+="</table>\n</div>";
+		}
+		content+="<div class=\"cbox\">\n"
+				"<a href=\"javascript:button.importBookmarks();\">[Импорт закладок]</a>"
+				"</div>\n";
 		return content;
 	}
 
