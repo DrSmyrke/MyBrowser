@@ -17,12 +17,14 @@ signals:
 	void signal_linkHovered(const QString &link);
 	void signal_createWindow(WebView** webView);
 	void signal_printRequested(QWebFrame * frame);
+	void signal_goToAbout();
 private:
 	WebPage* m_pWebPage;
 
 	// QWebView interface
 protected:
 	QWebView *createWindow(QWebPage::WebWindowType type) override;
+	void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // WEBVIEW_H

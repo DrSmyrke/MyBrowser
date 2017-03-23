@@ -41,3 +41,10 @@ QWebView *WebView::createWindow(QWebPage::WebWindowType type)
 	emit signal_createWindow(&webView);
 	return webView;
 }
+void WebView::contextMenuEvent(QContextMenuEvent *event)
+{
+	QMenu* menu=this->page()->createStandardContextMenu();
+		menu->addAction(QIcon("://images/about.svg"),tr("About"),this,SIGNAL(signal_goToAbout()));
+		qDebug()<<this->page()->currentFrame()->hitTestContent(event->pos()).linkUrl();
+	menu->exec(event->globalPos());
+}

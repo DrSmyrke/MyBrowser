@@ -6,17 +6,19 @@
 #include <QFile>
 #include <QDir>
 #include <QStandardPaths>
+#include <QMessageBox>
 
 namespace guiCfg {
 	const QSize buttonSize(30,30);
 }
 namespace app{
 	bool confEditState=false;
-	const QString appVersion="0.1";
+	const QString version="0.2";
 	QString themePage;
 	QString dataDir;
 	QString confFile;
 	QJsonObject confObj;
+	QJsonObject bookmarksObj;
 
 	QString getHtmlPage(const QString &title,const QString &content)
 	{
@@ -125,22 +127,23 @@ namespace app{
 		}
 		return &data;
 	}
-	void loadBookmarksJSON(const QString &file)
+	void importBookmarks(const QString &file)
 	{
-//		if(!QFile::exists(confFile)) return;
-//		QFile f(file);
-//		if (!f.open(QIODevice::ReadOnly)){
-//			printf("file [%s] not read!\n",file.toStdString().c_str());
-//			return;
-//		}
-//		auto data = f.readAll();
-//		f.close();
-//		QJsonDocument loadDoc(QJsonDocument::fromJson(data));
-//		QJsonObject inObj=loadDoc.object();
-//		QJsonObject::iterator it=inObj.find("uri");
-//		for(it;it!=inObj.end();++it){
-//			qDebug()<<it;
-//		}
+		if(!QFile::exists(confFile)) return;
+		QFile f(file);
+		if(!f.open(QIODevice::ReadOnly)){
+			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Unable to open file"));
+			return;
+		}
+		auto data = QString(f.readAll());
+		f.close();
+		if(data.contains("\"guid\":",Qt::CaseInsensitive)){	//JSON file
+			QJsonDocument loadDoc(QJsonDocument::fromJson(data.toLatin1()));
+			QJsonObject inObj=loadDoc.object();
+			for(auto elem:inObj.toVariantMap().toStdMap()){
+				qDebug()<<elem.first<<elem.second;
+			}
+		}
 	}
 	void createDefaultTheme(){
 		QFile file(dataDir+"/themes/default");

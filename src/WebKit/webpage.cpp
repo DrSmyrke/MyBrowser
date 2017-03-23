@@ -2,5 +2,5 @@
 
 WebPage::WebPage(QObject *parent) : QWebPage(parent)
 {
-	//this->action();
+	//this->action(QWebPage::InspectElement)
 }

@@ -10,7 +10,7 @@ namespace guiCfg {
 	const extern QSize buttonSize;
 }
 namespace app{
-	const extern QString appVersion;
+	const extern QString version;
 	extern QString themePage;
 	extern QString dataDir;
 	extern std::map<QString,QString> bookmarks;
@@ -20,7 +20,7 @@ namespace app{
 	void createConfig();
 	void saveConf();
 	void loadConf();
-	void loadBookmarksJSON(const QString &file);
+	void importBookmarks(const QString &file);
 	QString getVal(const QString &param);
 	void setVal(const QString &param, const QString &val);
 	QString getValInArray(const QString &array,const QString &param);

@@ -13,9 +13,9 @@ void JavaScriptObj::importBookmarks()
 	QString fileName = QFileDialog::getOpenFileName(nullptr
 													,tr("Import bookmarks")
 													,QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
-													,tr("Bookmarks Files (*.json *.xml)")
+													,tr("Bookmarks Files (*.json *.html)")
 													);
-	app::loadBookmarksJSON(fileName);
+	app::importBookmarks(fileName);
 }
 void JavaScriptObj::changeDownloadPath()
 {

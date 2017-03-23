@@ -29,6 +29,7 @@ private slots:
 	void slot_titleChanged(QWidget *widget, const QString &title);
 	void slot_newWindow(WebView **view);
 	void slot_openMenu();
+	void slot_openBookmarks();
 	void slot_printPage();
 	void slot_printRequested(QWebFrame *frame);
 private:

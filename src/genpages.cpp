@@ -43,4 +43,13 @@ namespace gp {
 
 		return content;
 	}
+	QString getAbout()
+	{
+		QString content="<script type=\"text/javascript\">var line=\"Developer: Dr.Smyrke [Smyrke2005@yandex.ru]<br>Engine: QT/Webkit<br>Language: C++<br>Application version: "
+				+app::version+"<br>\";var speed=100;var i=0;function init(){if(i++<line.length){document.getElementById(\"text\").innerHTML=line.substring(0,i);setTimeout(\'init()\',speed);}}</script>"
+				"<div class=\"cbox\"><span id=\"text\" class=\"valgreen\" style=\"font-family:\'Courier New\',\'Terminus\',\'Monospace\'\"></span></div>"
+				"<script type=\"text/javascript\">init();</script>";
+		return content;
+	}
+
 }

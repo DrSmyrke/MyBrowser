@@ -3,7 +3,7 @@
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	setWindowTitle("MyBrowser");
+	setWindowTitle("MyBrowser v"+app::version);
 	setMinimumSize(600,480);
 
 	QWidget* centrWidget=new QWidget(this);
@@ -20,23 +20,27 @@ MainWindow::MainWindow(QWidget *parent)
 				printB->setShortcut(QKeySequence::Print);
 				connect(printB,&QPushButton::clicked,this,&MainWindow::slot_printPage);
 		box->addWidget(printB,0,1);
+			QPushButton* bookmarksB=new QPushButton();
+				bookmarksB->setIcon(QIcon("://images/about.svg"));
+				bookmarksB->setMaximumSize(guiCfg::buttonSize);
+		box->addWidget(bookmarksB,0,2);
 			QPushButton* downloadsB=new QPushButton();
 				downloadsB->setIcon(QIcon("://images/save.svg"));
 				downloadsB->setMaximumSize(guiCfg::buttonSize);
-		box->addWidget(downloadsB,0,2);
+		box->addWidget(downloadsB,0,3);
 			QPushButton* addTabB=new QPushButton();
 				addTabB->setIcon(QIcon("://images/tab-new.svg"));
 				addTabB->setMaximumSize(guiCfg::buttonSize);
-		box->addWidget(addTabB,0,3);
+		box->addWidget(addTabB,0,4);
 			m_pFindFiled=new QLineEdit();
 				m_pFindFiled->setPlaceholderText(tr("Find text"));
 				m_pFindFiled->setMaximumWidth(200);
-		box->addWidget(m_pFindFiled,0,4);
+		box->addWidget(m_pFindFiled,0,5);
 			QPushButton* findB=new QPushButton();
 				findB->setIcon(QIcon("://images/find.svg"));
 
 				findB->setMaximumSize(guiCfg::buttonSize);
-		box->addWidget(findB,0,5);
+		box->addWidget(findB,0,6);
 		//body
 			m_pTabs=new QTabWidget();
 			m_pTabs->setTabsClosable(false);
@@ -58,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(m_pFindFiled,&QLineEdit::returnPressed,this,&MainWindow::slot_findToNewTab);
 	connect(findB,&QPushButton::clicked,this,&MainWindow::slot_findToNewTab);
 	connect(menuB,&QPushButton::clicked,this,&MainWindow::slot_openMenu);
+	connect(bookmarksB,&QPushButton::clicked,this,&MainWindow::slot_openBookmarks);
 
 	if(app::getVal("openBrowser")=="homePage") newTab(app::getVal("homePage"));
 	if(app::getVal("openBrowser")=="blank") newTab("");
@@ -93,6 +98,14 @@ void MainWindow::slot_openMenu()
 		if(tabWidget->getUrl()=="about:settings") return;
 	}
 	m_pTabs->setCurrentIndex(newTab("about:settings"));
+}
+void MainWindow::slot_openBookmarks()
+{
+	for(int i=0;i<m_pTabs->count();i++){
+		TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(i));
+		if(tabWidget->getUrl()=="about:bookmarks") return;
+	}
+	m_pTabs->setCurrentIndex(newTab("about:bookmarks"));
 }
 void MainWindow::slot_printPage()
 {

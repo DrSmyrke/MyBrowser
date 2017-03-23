@@ -11,7 +11,8 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		connect(m_pWebView,&WebView::linkClicked,this,&TabWidget::slot_linkClicked);
 		connect(m_pWebView,&WebView::signal_createWindow,this,&TabWidget::signal_createWindow);
 		connect(m_pWebView,&WebView::signal_printRequested,this,&TabWidget::signal_printRequested);
-		//connect(m_pWebView,&WebView::,this,&TabWidget::slot_customContextMenuRequested);
+		connect(m_pWebView,&WebView::signal_goToAbout,this,[this](){actionUrl("about:me");});
+
 
 	m_pProgressBar=new QProgressBar();
 		m_pProgressBar->setMaximumSize(100,16);
@@ -161,8 +162,7 @@ void TabWidget::actionUrl(const QString &url)
 	if(addr.toLower()=="about:me"){
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
-		QString content="<script type=\"text/javascript\">var line=\"Developer: Dr.Smyrke [Smyrke2005@yandex.ru]<br>Engine: QT/Webkit<br>Language: C++<br>Application version: "+app::appVersion+"<br>\";var speed=100;var i=0;function init(){if(i++<line.length){document.getElementById(\"text\").innerHTML=line.substring(0,i);setTimeout(\'init()\',speed);}}</script><div class=\"cbox\"><span id=\"text\" class=\"valgreen\" style=\"font-family:\'Courier New\',\'Terminus\',\'Monospace\'\"></span></div><script type=\"text/javascript\">init();</script>";
-		m_pWebView->setHtml(app::getHtmlPage(tr("ABOUT"),content),QUrl(url));
+		m_pWebView->setHtml(app::getHtmlPage(tr("ABOUT"),gp::getAbout()),QUrl(url));
 		slot_titleChanged(tr("ABOUT"));
 		return;
 	}
