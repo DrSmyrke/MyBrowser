@@ -40,6 +40,7 @@ private slots:
 	void slot_goToUrl();
 	void slot_linkHovered(const QString &link);
 	void slot_fintText(const QString &text);
+	void slot_addObj();
 private:
 	WebView* m_pWebView;
 	QWebInspector* m_pInspector;

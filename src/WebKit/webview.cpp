@@ -31,7 +31,12 @@ WebView::WebView(QWidget *parent) : QWebView(parent)
 		//m_pWebPage->setLinkDelegationPolicy(QWebPage::DelegateExternalLinks);
 		connect(m_pWebPage,&WebPage::linkHovered,this,&WebView::signal_linkHovered);
 		connect(m_pWebPage,&WebPage::printRequested,this,&WebView::signal_printRequested);
-	setPage(m_pWebPage);
+		connect(m_pWebPage,&WebPage::downloadRequested,this,&WebView::slot_downloadRequested);
+		setPage(m_pWebPage);
+}
+void WebView::slot_downloadRequested(const QNetworkRequest &request)
+{
+	//request.
 }
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
 {
@@ -44,7 +49,9 @@ QWebView *WebView::createWindow(QWebPage::WebWindowType type)
 void WebView::contextMenuEvent(QContextMenuEvent *event)
 {
 	QMenu* menu=this->page()->createStandardContextMenu();
-		menu->addAction(QIcon("://images/about.svg"),tr("About"),this,SIGNAL(signal_goToAbout()));
-		qDebug()<<this->page()->currentFrame()->hitTestContent(event->pos()).linkUrl();
+		menu->addSeparator();
+		menu->addAction(tr("Hide inspector"),this,SIGNAL(signal_hideInspector()));
+		menu->addAction(QIcon("://images/about.png"),tr("About"),this,SIGNAL(signal_goToAbout()));
+		//qDebug()<<this->page()->currentFrame()->hitTestContent(event->pos()).linkUrl();
 	menu->exec(event->globalPos());
 }

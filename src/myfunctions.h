@@ -22,6 +22,7 @@ namespace app{
 	void loadConf();
 	void importBookmarks(const QString &file);
 	void addUnsortBookmark(const QString &param, const QString &val);
+	void moveToBookmark(const QString &arrayIn, const QString &arrayTo, const QString &param);
 	std::map<QString,QString>* getArrayBookmark(const QString &array);
 	void loadBookmarks();
 	void saveBookmarks();

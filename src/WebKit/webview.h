@@ -18,10 +18,11 @@ signals:
 	void signal_createWindow(WebView** webView);
 	void signal_printRequested(QWebFrame * frame);
 	void signal_goToAbout();
+	void signal_hideInspector();
+private slots:
+	void slot_downloadRequested(const QNetworkRequest &request);
 private:
 	WebPage* m_pWebPage;
-
-	// QWebView interface
 protected:
 	QWebView *createWindow(QWebPage::WebWindowType type) override;
 	void contextMenuEvent(QContextMenuEvent *event) override;

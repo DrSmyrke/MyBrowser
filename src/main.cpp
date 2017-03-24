@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	#if defined(Q_OS_WIN)
-		app::dataDir=QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+"/MyBrowser";
+		app::dataDir=QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 	#elif defined(Q_OS_UNIX)
 		app::dataDir=QStandardPaths::writableLocation(QStandardPaths::HomeLocation)+"/.MyBrowser";
 	#endif

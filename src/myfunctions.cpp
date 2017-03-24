@@ -9,10 +9,11 @@
 #include <QMessageBox>
 
 namespace guiCfg {
-	const QSize buttonSize(30,30);
+	const QSize buttonSize(26,26);
 }
 namespace app{
 	bool confEditState=false;
+	bool bookmarksEditState=false;
 	const QString version="0.2";
 	QString themePage;
 	QString dataDir;
@@ -171,6 +172,17 @@ namespace app{
 		QJsonObject inObj=bookmarksObj["unsort"].toObject();
 		inObj[param]=val;
 		bookmarksObj["unsort"]=inObj;
+		bookmarksEditState=true;
+	}
+	void moveToBookmark(const QString &arrayIn, const QString &arrayTo, const QString &param)
+	{
+		if(arrayIn.isEmpty() or arrayTo.isEmpty() or param.isEmpty()) return;
+		QJsonObject inObj=bookmarksObj[arrayIn].toObject();
+		QJsonObject inObj2=bookmarksObj[arrayTo].toObject();
+		inObj2[param]=inObj.take(param).toString();
+		bookmarksObj[arrayTo]=inObj2;
+		bookmarksObj[arrayIn]=inObj;
+		bookmarksEditState=true;
 	}
 	std::map<QString,QString>* getArrayBookmark(const QString &array)
 	{
@@ -197,7 +209,7 @@ namespace app{
 	}
 	void saveBookmarks()
 	{
-		//if(!confEditState) return;
+		if(!bookmarksEditState) return;
 		QFile file(bookmarksFile);
 		if (!file.open(QIODevice::WriteOnly)){
 			QMessageBox::warning(nullptr,QObject::tr("Warning"),QObject::tr("Cannot save config file!"));
@@ -206,7 +218,7 @@ namespace app{
 		QJsonDocument saveDoc(bookmarksObj);
 		file.write(saveDoc.toJson());
 		file.close();
-		//confEditState=false;
+		bookmarksEditState=false;
 	}
 	void createDefaultTheme(){
 		QFile file(dataDir+"/themes/default");

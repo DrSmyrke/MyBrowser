@@ -32,6 +32,11 @@ void JavaScriptObj::toggleVal(const QString &param)
 	int val=(app::getVal(param)=="1" or app::getVal(param)=="true")?0:1;
 	app::setVal(param,QString::number(val));
 }
+void JavaScriptObj::bookmarkMoveTo(const QString &arrayIn, const QString &arrayTo, const QString &param)
+{
+	app::moveToBookmark(arrayIn,arrayTo,param);
+	emit signal_reload();
+}
 void JavaScriptObj::setVal(const QString &param, const QString &value)
 {
 	app::setVal(param,value);

@@ -12,42 +12,53 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 		connect(m_pWebView,&WebView::signal_createWindow,this,&TabWidget::signal_createWindow);
 		connect(m_pWebView,&WebView::signal_printRequested,this,&TabWidget::signal_printRequested);
 		connect(m_pWebView,&WebView::signal_goToAbout,this,[this](){actionUrl("about:me");});
+		connect(m_pWebView,&WebView::signal_hideInspector,this,[this](){
+			if(m_pInspector->isVisible()) m_pInspector->hide();
+		});
+		connect(m_pWebView->page()->mainFrame(),&QWebFrame::javaScriptWindowObjectCleared,this,&TabWidget::slot_addObj);
 
 
 	m_pProgressBar=new QProgressBar();
 		m_pProgressBar->setMaximumSize(100,16);
 	m_pPrefB=new QPushButton();
-		m_pPrefB->setIcon(QIcon("://images/previous.svg"));
+		m_pPrefB->setIcon(QIcon("://images/previous.png"));
 		m_pPrefB->setMaximumSize(guiCfg::buttonSize);
+		m_pPrefB->setFlat(true);
 		m_pPrefB->hide();
 		connect(m_pPrefB,&QPushButton::clicked,m_pWebView,&WebView::back);
 	m_pNextB=new QPushButton();
-		m_pNextB->setIcon(QIcon("://images/next.svg"));
+		m_pNextB->setIcon(QIcon("://images/next.png"));
 		m_pNextB->setMaximumSize(guiCfg::buttonSize);
+		m_pNextB->setFlat(true);
 		m_pNextB->hide();
 		connect(m_pNextB,&QPushButton::clicked,m_pWebView,&WebView::forward);
 	m_pUrlField=new QLineEdit();
 		m_pUrlField->setPlaceholderText(tr("url page"));
 		connect(m_pUrlField,&QLineEdit::returnPressed,this,&TabWidget::slot_goToUrl);
 	QPushButton* goB=new QPushButton();
-		goB->setIcon(QIcon("://images/apply.svg"));
+		goB->setIcon(QIcon("://images/apply.png"));
 		goB->setMaximumSize(guiCfg::buttonSize);
+		goB->setFlat(true);
 		connect(goB,&QPushButton::clicked,this,&TabWidget::slot_goToUrl);
 	m_pReloadB=new QPushButton();
-		m_pReloadB->setIcon(QIcon("://images/refresh.svg"));
+		m_pReloadB->setIcon(QIcon("://images/refresh.png"));
 		m_pReloadB->setMaximumSize(guiCfg::buttonSize);
+		m_pReloadB->setFlat(true);
 		connect(m_pReloadB,&QPushButton::clicked,m_pWebView,&WebView::reload);
 	m_pStopB=new QPushButton();
-		m_pStopB->setIcon(QIcon("://images/close.svg"));
+		m_pStopB->setIcon(QIcon("://images/close.png"));
 		m_pStopB->setMaximumSize(guiCfg::buttonSize);
+		m_pStopB->setFlat(true);
 		connect(m_pStopB,&QPushButton::clicked,m_pWebView,&WebView::stop);
 	QPushButton* goHomeB=new QPushButton();
-		goHomeB->setIcon(QIcon("://images/home.svg"));
+		goHomeB->setIcon(QIcon("://images/home.png"));
 		goHomeB->setMaximumSize(guiCfg::buttonSize);
+		goHomeB->setFlat(true);
 		connect(goHomeB,&QPushButton::clicked,this,[this](){m_pWebView->load(app::getVal("homePage"));});
 	QPushButton* goFindB=new QPushButton();
-		goFindB->setIcon(QIcon("://images/find.svg"));
+		goFindB->setIcon(QIcon("://images/find.png"));
 		goFindB->setMaximumSize(guiCfg::buttonSize);
+		goFindB->setFlat(true);
 		goFindB->setShortcut(QKeySequence::Find);
 		connect(goFindB,&QPushButton::clicked,this,[this](){
 			if(!m_pFindBox->isVisible()) m_pFindBox->show();
@@ -66,7 +77,7 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 					connect(m_pTextFind,&QLineEdit::textChanged,this,&TabWidget::slot_fintText);
 			findBoxLayout->addWidget(m_pTextFind);
 				QPushButton* findBackB=new QPushButton();
-					findBackB->setIcon(QIcon("://images/previous.svg"));
+					findBackB->setIcon(QIcon("://images/previous.png"));
 					findBackB->setMaximumSize(guiCfg::buttonSize);
 					findBackB->setShortcut(QKeySequence::FindPrevious);
 					connect(findBackB,&QPushButton::clicked,this,[this](){
@@ -74,7 +85,7 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 					});
 			findBoxLayout->addWidget(findBackB);
 				QPushButton* findNextB=new QPushButton();
-					findNextB->setIcon(QIcon("://images/next.svg"));
+					findNextB->setIcon(QIcon("://images/next.png"));
 					findNextB->setMaximumSize(guiCfg::buttonSize);
 					findNextB->setShortcut(QKeySequence::FindNext);
 					connect(findNextB,&QPushButton::clicked,this,[this](){
@@ -91,7 +102,7 @@ TabWidget::TabWidget(QWidget *parent) : QWidget(parent)
 				});
 			findBoxLayout->addWidget(m_pFindAll);
 				QPushButton* findCloseB=new QPushButton();
-					findCloseB->setIcon(QIcon("://images/close.svg"));
+					findCloseB->setIcon(QIcon("://images/close.png"));
 					findCloseB->setMaximumSize(guiCfg::buttonSize);
 					connect(findCloseB,&QPushButton::clicked,m_pFindBox,&QWidget::hide);
 			findBoxLayout->addWidget(findCloseB);
@@ -139,19 +150,17 @@ void TabWidget::actionUrl(const QString &url)
 	QString addr=url;
 	if(url.isEmpty()) addr="about:blank";
 	if(addr.toLower()=="about:settings"){
-		JavaScriptObj* obj=new JavaScriptObj();
+		JavaScriptObj* javaScriptObj=new JavaScriptObj();
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
-		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("settings",obj);
+		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("obj",javaScriptObj);
 		m_pWebView->setHtml(app::getHtmlPage(tr("SETTINGS"),gp::getSettings()),QUrl(url));
 		slot_titleChanged(tr("SETTINGS"));
 		return;
 	}
 	if(addr.toLower()=="about:bookmarks"){
-		JavaScriptObj* obj=new JavaScriptObj();
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		m_pWebView->page()->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
-		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("button",obj);
 		m_pWebView->setHtml(app::getHtmlPage(tr("BOOKMARKS"),gp::getBookmarks()),QUrl(url));
 		slot_titleChanged(tr("BOOKMARKS"));
 		return;
@@ -172,6 +181,7 @@ void TabWidget::actionUrl(const QString &url)
 	if(proto.contains("http",Qt::CaseInsensitive) or proto.contains("https",Qt::CaseInsensitive)){
 		m_pWebView->load(QUrl(url));
 	}
+	if(proto.isEmpty())	m_pWebView->load(QUrl(QString("http://"+url)));
 }
 
 void TabWidget::slot_linkHovered(const QString &link)
@@ -187,6 +197,16 @@ void TabWidget::slot_fintText(const QString &text)
 		m_pFindAll->setChecked(false);
 	}
 	m_pWebView->findText(text);
+}
+void TabWidget::slot_addObj()
+{
+	if(m_pWebView->url().toString()=="about:bookmarks"){
+		JavaScriptObj* javaScriptObj=new JavaScriptObj();
+			connect(javaScriptObj,&JavaScriptObj::signal_reload,this,[this](){
+				actionUrl(m_pWebView->url().toString());
+			});
+		m_pWebView->page()->mainFrame()->addToJavaScriptWindowObject("obj",javaScriptObj);
+	}
 }
 void TabWidget::slot_goToUrl()
 {

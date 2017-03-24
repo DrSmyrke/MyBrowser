@@ -12,11 +12,12 @@ class JavaScriptObj : public QObject
 public:
 	explicit JavaScriptObj(QObject *parent = 0);
 signals:
-
+	void signal_reload();
 public slots:
 	void importBookmarks();
 	void changeDownloadPath();
 	void toggleVal(const QString &param);
+	void bookmarkMoveTo(const QString &arrayIn,const QString &arrayTo,const QString &param);
 	void setVal(const QString &param, const QString &value);
 };
 

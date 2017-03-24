@@ -11,6 +11,7 @@
 #include <QtPrintSupport/QPrinter>
 #include <QtWebKit>
 #include <QtWebKitWidgets/QWebFrame>
+#include <QtNetwork/QSslSocket>
 
 #include "myfunctions.h"
 #include "tabwidget.h"

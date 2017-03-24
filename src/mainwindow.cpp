@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <QMessageBox>
+
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -11,35 +13,40 @@ MainWindow::MainWindow(QWidget *parent)
 		box->setContentsMargins(0,3,0,0);
 		//top panel
 			QPushButton* menuB=new QPushButton();
-				menuB->setIcon(QIcon("://images/system.svg"));
+				menuB->setIcon(QIcon("://images/system.png"));
 				menuB->setMaximumSize(guiCfg::buttonSize);
+				menuB->setFlat(true);
 		box->addWidget(menuB,0,0);
 			QPushButton* printB=new QPushButton();
-				printB->setIcon(QIcon("://images/print.svg"));
+				printB->setIcon(QIcon("://images/print.png"));
 				printB->setMaximumSize(guiCfg::buttonSize);
+				printB->setFlat(true);
 				printB->setShortcut(QKeySequence::Print);
 				connect(printB,&QPushButton::clicked,this,&MainWindow::slot_printPage);
 		box->addWidget(printB,0,1);
 			QPushButton* bookmarksB=new QPushButton();
-				bookmarksB->setIcon(QIcon("://images/about.svg"));
+				bookmarksB->setIcon(QIcon("://images/about.png"));
 				bookmarksB->setMaximumSize(guiCfg::buttonSize);
+				bookmarksB->setFlat(true);
 		box->addWidget(bookmarksB,0,2);
 			QPushButton* downloadsB=new QPushButton();
-				downloadsB->setIcon(QIcon("://images/save.svg"));
+				downloadsB->setIcon(QIcon("://images/save.png"));
 				downloadsB->setMaximumSize(guiCfg::buttonSize);
+				downloadsB->setFlat(true);
 		box->addWidget(downloadsB,0,3);
 			QPushButton* addTabB=new QPushButton();
-				addTabB->setIcon(QIcon("://images/tab-new.svg"));
+				addTabB->setIcon(QIcon("://images/tab-new.png"));
 				addTabB->setMaximumSize(guiCfg::buttonSize);
+				addTabB->setFlat(true);
 		box->addWidget(addTabB,0,4);
 			m_pFindFiled=new QLineEdit();
 				m_pFindFiled->setPlaceholderText(tr("Find text"));
 				m_pFindFiled->setMaximumWidth(200);
 		box->addWidget(m_pFindFiled,0,5);
 			QPushButton* findB=new QPushButton();
-				findB->setIcon(QIcon("://images/find.svg"));
-
+				findB->setIcon(QIcon("://images/find.png"));
 				findB->setMaximumSize(guiCfg::buttonSize);
+				findB->setFlat(true);
 		box->addWidget(findB,0,6);
 		//body
 			m_pTabs=new QTabWidget();
@@ -69,6 +76,13 @@ MainWindow::MainWindow(QWidget *parent)
 	if(app::getVal("openBrowser")=="lastTime"){
 		for(auto elem:*app::getArray("lastPages")) newTab(elem.second);
 	}
+
+#ifndef QT_NO_OPENSSL
+	if (!QSslSocket::supportsSsl()) {
+	QMessageBox::information(0, "Demo Browser",
+				 "This system does not support OpenSSL. SSL websites will not be available.");
+	}
+#endif
 }
 void MainWindow::slot_closeTab(int index)
 {
@@ -76,6 +90,7 @@ void MainWindow::slot_closeTab(int index)
 	if(m_pTabs->count()<2) return;
 	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(index));
 	if(tabWidget->getUrl()=="about:settings") app::saveConf();
+	if(tabWidget->getUrl()=="about:bookmarks") app::saveBookmarks();
 	tabWidget->stop();
 	tabWidget->deleteLater();
 	m_pTabs->removeTab(index);
@@ -168,4 +183,5 @@ MainWindow::~MainWindow()
 		}
 	}
 	app::saveConf();
+	app::saveBookmarks();
 }
