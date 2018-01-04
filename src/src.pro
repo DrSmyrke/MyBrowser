@@ -8,15 +8,19 @@ QT       += core gui webkit webkitwidgets printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = src
+TARGET = myBrowser
 TEMPLATE = app
-RC_FILE = index.rc
+win32|win64{
+    RC_FILE=  index.rc
+    OTHER_FILES+= index.rc
+    DISTFILES += index.rc
+}
 QMAKE_CXXFLAGS += "-std=c++11"
 
-TRANSLATIONS = lang/ru.ts
+TRANSLATIONS = lang/ru_RU.ts
 SOURCES += main.cpp\
         mainwindow.cpp \
-    myfunctions.cpp \
+    global.cpp \
     WebKit/webview.cpp \
     tabwidget.cpp \
     WebKit/webpage.cpp \
@@ -24,7 +28,7 @@ SOURCES += main.cpp\
     genpages.cpp
 
 HEADERS  += mainwindow.h \
-    myfunctions.h \
+    global.h \
     WebKit/webview.h \
     tabwidget.h \
     WebKit/webpage.h \

@@ -2,7 +2,7 @@
 #define JAVASCRIPTOBJ_H
 
 #include <QObject>
-#include "myfunctions.h"
+#include "global.h"
 //FIXME: remove
 #include <QDebug>
 
@@ -17,7 +17,8 @@ public slots:
 	void importBookmarks();
 	void changeDownloadPath();
 	void toggleVal(const QString &param);
-	void bookmarkMoveTo(const QString &arrayIn,const QString &arrayTo,const QString &param);
+	void bookmarkRemove(const QString &array, const QString &param);
+	void bookmarkMoveTo(const QString &arrayTo, const QString &param);
 	void setVal(const QString &param, const QString &value);
 };
 

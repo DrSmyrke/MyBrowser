@@ -14,7 +14,7 @@
 
 #include "WebKit/webview.h"
 #include "javascriptobj.h"
-#include "myfunctions.h"
+#include "global.h"
 #include "genpages.h"
 
 class TabWidget : public QWidget

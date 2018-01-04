@@ -5,25 +5,25 @@ WebView::WebView(QWidget *parent) : QWebView(parent)
 	m_pWebPage= new WebPage(this);
 		m_pWebPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
 
-		if(app::getVal("enableJavascript")=="1" or app::getVal("enableJavascript")=="true"){
+		if(app::conf.web.enableJavascript){
 			m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,true);
 		}else{
 			m_pWebPage->settings()->setAttribute(QWebSettings::JavascriptEnabled,false);
 		}
 
-		if(app::getVal("autoLoadImages")=="1" or app::getVal("autoLoadImages")=="true"){
+		if(app::conf.web.autoLoadImages){
 			m_pWebPage->settings()->setAttribute(QWebSettings::AutoLoadImages,true);
 		}else{
 			m_pWebPage->settings()->setAttribute(QWebSettings::AutoLoadImages,false);
 		}
 
-		if(app::getVal("enableJavaApplets")=="1" or app::getVal("enableJavaApplets")=="true"){
+		if(app::conf.web.enableJavaApplets){
 			m_pWebPage->settings()->setAttribute(QWebSettings::JavaEnabled,true);
 		}else{
 			m_pWebPage->settings()->setAttribute(QWebSettings::JavaEnabled,false);
 		}
 
-		if(app::getVal("enableLocalStorage")=="1" or app::getVal("enableLocalStorage")=="true"){
+		if(app::conf.web.enableLocalStorage){
 			m_pWebPage->settings()->setAttribute(QWebSettings::LocalStorageEnabled,true);
 		}else{
 			m_pWebPage->settings()->setAttribute(QWebSettings::LocalStorageEnabled,false);
@@ -36,6 +36,8 @@ WebView::WebView(QWidget *parent) : QWebView(parent)
 }
 void WebView::slot_downloadRequested(const QNetworkRequest &request)
 {
+	qDebug()<<request.url();
+	//request.
 	//request.
 }
 QWebView *WebView::createWindow(QWebPage::WebWindowType type)
@@ -51,6 +53,10 @@ void WebView::contextMenuEvent(QContextMenuEvent *event)
 	QMenu* menu=this->page()->createStandardContextMenu();
 		menu->addSeparator();
 		menu->addAction(tr("Hide inspector"),this,SIGNAL(signal_hideInspector()));
+
+		//menu->addAction(tr("Show source"),this,[this](){
+		//	m_pWebPage->setContentEditable(true);
+		//});
 		menu->addAction(QIcon("://images/about.png"),tr("About"),this,SIGNAL(signal_goToAbout()));
 		//qDebug()<<this->page()->currentFrame()->hitTestContent(event->pos()).linkUrl();
 	menu->exec(event->globalPos());

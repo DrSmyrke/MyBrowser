@@ -13,7 +13,7 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtNetwork/QSslSocket>
 
-#include "myfunctions.h"
+#include "global.h"
 #include "tabwidget.h"
 
 class MainWindow : public QMainWindow
@@ -24,7 +24,6 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 private slots:
-	void slot_newTab(){newTab("");}
 	void slot_closeTab(int index);
 	void slot_findToNewTab();
 	void slot_titleChanged(QWidget *widget, const QString &title);

@@ -6,7 +6,7 @@
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QWebFrame>
 #include "webpage.h"
-#include "myfunctions.h"
+#include "global.h"
 
 class WebView : public QWebView
 {

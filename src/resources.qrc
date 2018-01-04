@@ -12,5 +12,8 @@
         <file>images/save.png</file>
         <file>images/system.png</file>
         <file>images/tab-new.png</file>
+        <file>index.ico</file>
+        <file>lang/ru_RU.qm</file>
+        <file>images/bookmark-add.png</file>
     </qresource>
 </RCC>

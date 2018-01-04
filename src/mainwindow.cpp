@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 
+#include <QTabBar>
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	setWindowTitle("MyBrowser v"+app::version);
-	setMinimumSize(600,480);
+	setWindowTitle("MyBrowser v"+app::conf.version);
+	setWindowIcon(QIcon("://index.ico"));
+	setMinimumSize(640,480);
 
 	QWidget* centrWidget=new QWidget(this);
 		QGridLayout* box=new QGridLayout();
@@ -14,29 +16,29 @@ MainWindow::MainWindow(QWidget *parent)
 		//top panel
 			QPushButton* menuB=new QPushButton();
 				menuB->setIcon(QIcon("://images/system.png"));
-				menuB->setMaximumSize(guiCfg::buttonSize);
+				menuB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				menuB->setFlat(true);
 		box->addWidget(menuB,0,0);
 			QPushButton* printB=new QPushButton();
 				printB->setIcon(QIcon("://images/print.png"));
-				printB->setMaximumSize(guiCfg::buttonSize);
+				printB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				printB->setFlat(true);
 				printB->setShortcut(QKeySequence::Print);
 				connect(printB,&QPushButton::clicked,this,&MainWindow::slot_printPage);
 		box->addWidget(printB,0,1);
 			QPushButton* bookmarksB=new QPushButton();
 				bookmarksB->setIcon(QIcon("://images/about.png"));
-				bookmarksB->setMaximumSize(guiCfg::buttonSize);
+				bookmarksB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				bookmarksB->setFlat(true);
 		box->addWidget(bookmarksB,0,2);
 			QPushButton* downloadsB=new QPushButton();
 				downloadsB->setIcon(QIcon("://images/save.png"));
-				downloadsB->setMaximumSize(guiCfg::buttonSize);
+				downloadsB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				downloadsB->setFlat(true);
 		box->addWidget(downloadsB,0,3);
 			QPushButton* addTabB=new QPushButton();
 				addTabB->setIcon(QIcon("://images/tab-new.png"));
-				addTabB->setMaximumSize(guiCfg::buttonSize);
+				addTabB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				addTabB->setFlat(true);
 		box->addWidget(addTabB,0,4);
 			m_pFindFiled=new QLineEdit();
@@ -45,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 		box->addWidget(m_pFindFiled,0,5);
 			QPushButton* findB=new QPushButton();
 				findB->setIcon(QIcon("://images/find.png"));
-				findB->setMaximumSize(guiCfg::buttonSize);
+				findB->setMaximumSize(app::conf.guiCfg.buttonSize);
 				findB->setFlat(true);
 		box->addWidget(findB,0,6);
 		//body
@@ -65,16 +67,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 	//signals
 	connect(m_pTabs,&QTabWidget::tabCloseRequested,this,&MainWindow::slot_closeTab);
-	connect(addTabB,&QPushButton::clicked,this,&MainWindow::slot_newTab);
+	connect(addTabB,&QPushButton::clicked,this,[this](){ newTab("about:blank"); });
 	connect(m_pFindFiled,&QLineEdit::returnPressed,this,&MainWindow::slot_findToNewTab);
 	connect(findB,&QPushButton::clicked,this,&MainWindow::slot_findToNewTab);
 	connect(menuB,&QPushButton::clicked,this,&MainWindow::slot_openMenu);
 	connect(bookmarksB,&QPushButton::clicked,this,&MainWindow::slot_openBookmarks);
 
-	if(app::getVal("openBrowser")=="homePage") newTab(app::getVal("homePage"));
-	if(app::getVal("openBrowser")=="blank") newTab("");
-	if(app::getVal("openBrowser")=="lastTime"){
-		for(auto elem:*app::getArray("lastPages")) newTab(elem.second);
+	if(app::conf.openBrowser == "homePage") newTab(app::conf.homePage);
+	if(app::conf.openBrowser == "blank") newTab("about:blank");
+	if(app::conf.openBrowser == "lastTime"){
+		for(auto elem:app::conf.lastPages) newTab(elem);
 	}
 
 #ifndef QT_NO_OPENSSL
@@ -89,8 +91,9 @@ void MainWindow::slot_closeTab(int index)
 	if(index==-1) index=m_pTabs->currentIndex();
 	if(m_pTabs->count()<2) return;
 	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(index));
-	if(tabWidget->getUrl()=="about:settings") app::saveConf();
-	if(tabWidget->getUrl()=="about:bookmarks") app::saveBookmarks();
+	//TODO: Надо ли?
+	//if(tabWidget->getUrl()=="about:settings") app::saveSettings();
+	//if(tabWidget->getUrl()=="about:bookmarks") app::saveBookmarks();
 	tabWidget->stop();
 	tabWidget->deleteLater();
 	m_pTabs->removeTab(index);
@@ -102,9 +105,7 @@ void MainWindow::slot_newWindow(WebView **view)
 	(*view) = tabWidget->getView();
 	int index=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
-	if(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true"){
-		m_pTabs->setCurrentIndex(index);
-	}
+	if(app::conf.switchToNewTab) m_pTabs->setCurrentIndex(index);
 }
 void MainWindow::slot_openMenu()
 {
@@ -124,7 +125,6 @@ void MainWindow::slot_openBookmarks()
 }
 void MainWindow::slot_printPage()
 {
-	if (!m_pTabs->currentIndex()) return;
 	TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(m_pTabs->currentIndex()));
 	slot_printRequested(tabWidget->getView()->page()->mainFrame());
 }
@@ -149,9 +149,7 @@ int MainWindow::newTab(QString url)
 	tabWidget->actionUrl(url);
 	int index=m_pTabs->addTab(tabWidget,tr("New Tab"));
 	if(m_pTabs->count()>1) m_pTabs->setTabsClosable(true);
-	if(app::getVal("switchToTheTab")=="1" or app::getVal("switchToTheTab")=="true"){
-		m_pTabs->setCurrentIndex(index);
-	}
+	if(app::conf.switchToNewTab) m_pTabs->setCurrentIndex(index);
 	return index;
 }
 
@@ -175,13 +173,13 @@ void MainWindow::slot_titleChanged(QWidget *widget, const QString &title)
 }
 MainWindow::~MainWindow()
 {
-	if(app::getVal("openBrowser")=="lastTime"){
+	if(app::conf.openBrowser == "lastTime"){
+		app::conf.lastPages.clear();
 		for(int i=0;i<m_pTabs->count();i++){
 			TabWidget* tabWidget=static_cast<TabWidget*>(m_pTabs->widget(i));
 			if(tabWidget->getUrl()=="about:settings") continue;
-			app::setValInArray("lastPages",QString::number(i),tabWidget->getUrl());
+			app::conf.lastPages.push_back(tabWidget->getUrl());
 		}
 	}
-	app::saveConf();
-	app::saveBookmarks();
+	app::saveSettings();
 }

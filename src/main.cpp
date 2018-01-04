@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "myfunctions.h"
+#include "global.h"
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
@@ -9,17 +9,19 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	#if defined(Q_OS_WIN)
-		app::dataDir=QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+		app::conf.dataDir=QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 	#elif defined(Q_OS_UNIX)
-		app::dataDir=QStandardPaths::writableLocation(QStandardPaths::HomeLocation)+"/.MyBrowser";
+		app::conf.dataDir=QStandardPaths::writableLocation(QStandardPaths::HomeLocation)+"/.MyBrowser";
 	#endif
-	app::chkDirs();
-	QString appdir = a.applicationDirPath();
+
+	app::conf.version = "0.3";
+	app::conf.guiCfg.buttonSize = QSize(26,26);
+	app::loadSettings();
+
+
 	QString filename = QLocale::system().name();
 	QTranslator translator(&a);
-	if(!translator.load(filename,appdir + "/lang/"))
-		translator.load(filename,app::dataDir + "/lang/");
-	a.installTranslator(&translator);
+	if(translator.load(filename,"://lang/")) a.installTranslator(&translator);
 
 	MainWindow w;
 	w.show();

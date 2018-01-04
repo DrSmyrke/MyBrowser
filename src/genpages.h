@@ -2,12 +2,13 @@
 #define GENPAGES_H
 
 #include <QString>
-#include "myfunctions.h"
+#include "global.h"
 
 namespace gp {
 	QString getSettings();
 	QString getAbout();
 	QString getBookmarks();
+	QString getBlank();
 }
 
 #endif // GENPAGES_H
